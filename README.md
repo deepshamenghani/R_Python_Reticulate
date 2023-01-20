@@ -32,7 +32,7 @@ In this step, we used Reticulate to call Python functions in R to get the releva
 
 Additionally, for a more detailed explanation and full learnsing from this step, please see our article at **Add link when published**.
 
-### Step 3: Data Exploration
+### Step 3: Data exploration and recommendation
 Now that we had our data in R, it was easy to explore the data using summary statistics and data visualizations using ggplot.  Using this information, we could draw conclusions about what kind of yarn to buy.  You can see the code for this step in `Ravelry_visualize.qmd`
 
 First, we cleaned the data to ensure the columns were in the right formats, and the data was cleaned to make our visuals.  Some examples of this included simplifiying yarn weight categories, clarrifying lables and discriptions, parsing relevant information like pattern author, and more.
@@ -61,4 +61,4 @@ Finally, yarnsandcoffee has decided to be extra generous and buy rieslingm a gif
 
 Yarnsandcoffee has a few authors to choose from, but she also might take this opportunity to introduce rieslingm to her own favorite designer, PetiteKnit!
 
-Overall, through this data exploration project, yarnsandcoffee now has a lot of information to go to her local yarn store to buy rieslingm a wonderful gift!
+Overall, through this data exploration project, yarnsandcoffee now has a lot of information to go to her local yarn store to buy rieslingm a wonderful gift! She will likely buy 1,400 yards of DK weight yarn for an Andea Mowry sweater.  A very, very generous gift!
