@@ -13,8 +13,6 @@ This specific project was a one time analysis. However, it could be expanded to 
 ### Skills demonstrated:
 * Pulling data with APIs in Python using Flask
 * Collaborating between Python and R using Reticulate
-* Data cleaning, and exploratory data analysis
-* Data Visualization using GGPlot in R
 * Techincal writing
 
 ### Notes
@@ -35,7 +33,7 @@ In this step, we used Reticulate to call Python functions in R to get the releva
 Additionally, for a more detailed explanation and full learnsing from this step, please see our article at **Add link when published**.
 
 ### Step 3: Data Exploration
-Now that we had our data in R, it was easy to explore the data using summary statistics and data visualizations.  Using this information, we could draw conclusions about what kind of yarn to buy.  You can see the code for this step in `Ravelry_visualize.qmd`
+Now that we had our data in R, it was easy to explore the data using summary statistics and data visualizations using ggplot.  Using this information, we could draw conclusions about what kind of yarn to buy.  You can see the code for this step in `Ravelry_visualize.qmd`
 
 First, we cleaned the data to ensure the columns were in the right formats, and the data was cleaned to make our visuals.  Some examples of this included simplifiying yarn weight categories, clarrifying lables and discriptions, parsing relevant information like pattern author, and more.
 
