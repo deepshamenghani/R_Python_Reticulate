@@ -1,6 +1,6 @@
 # R_Python_Reticulate
 
-![image](https://user-images.githubusercontent.com/46545400/215614432-b46a0d2f-1376-45ba-8d93-2511ed217e8f.png)
+![image](https://user-images.githubusercontent.com/46545400/215617339-e7395331-7483-4d4e-9c38-10d487641c76.png)
 
 ## Overview
 
