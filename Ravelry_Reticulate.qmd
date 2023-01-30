@@ -1,6 +1,6 @@
 ---
 title: "Calling python functions from R using Reticulate"
-description: This article details the process of working with R and Python together using Reticulate and Miniconda
+description: This article presents an overview of Reticulate package and a step-by-step guide on how to use it to collaborate between R and Python.
 date: today 
 author: Deepsha Menghani and Riesling Meyer
 url: https://github.com/deepshamenghani
@@ -25,33 +25,36 @@ knitr::opts_chunk$set(
 )
 ```
 
-Riesling and I worked together on a Microsoft Hackathon project to analyze data around our common hobby using Python and R. For our Hackathon, we decided to use our data science skills to analyze our knitting queues on [Ravelry](https://www.ravelry.com/), a social networking and organizational website for any yarn related crafts. Through this project our goal was to:
+Riesling and I worked together on a Microsoft Hackathon project to analyze data around our common hobby using Python and R. We wanted to use our data science skills to analyze our knitting queues on [Ravelry](https://www.ravelry.com/), a social networking and organizational website for yarn-related crafts. Through this project our goal was to:
 
-1.  Learn to pull data with API calls in Python using Flask
-2.  Access the output of Python API calls from R easily using Reticulate
-3.  Analyze our project data using GGPlot in R
-4.  Package a Data Science portfolio project
+1.  Learn to pull data with API calls in Python using Flask.
 
-This is the second article in a four-part series aimed at going in-depth into each of the above steps. This article will provide you an overview of how we used the "[Reticulate](https://cran.r-project.org/web/packages/reticulate/index.html)" package to collaborate between R and Python.
+2.  Access the output of Python API calls from R easily using Reticulate.
 
-You can find the first article in the series \[here\]() that gives a handy overview of APIs and a step-by-step guide on how to use APIs in Python for first time API users. To keep an eye out for upcoming articles in this series, follow [Riesling](https://medium.com/@rieslingfyi), [Deepsha](https://medium.com/@menghani.deepsha) or [Data Science \@ Microsoft](https://medium.com/data-science-at-microsoft) (all on medium).
+3.  Analyze our project data using GGPlot in R and create a portfolio project.
 
-# Why collaborate between R and Python
+This is the second article in a three-part series aimed at going in-depth into each of the above steps. This article provides an overview of how we used the \"[Reticulate](https://cran.r-project.org/web/packages/reticulate/index.html)\" package to collaborate between R and Python.
 
-Both R and Python are strong Data Science languages and enable one to accomplish end to end analytics projects. However there may be somethings you would want to do in Python and somethings in R. There might also be a scenario where you might want to use R and collaborate with another team mate on a project where they may prefer Python. Reticulate makes it extremely easy to collaborate and talk between the two languages. I think of it as a translator on my finger tips.
+You can find the first article in the series [here](https://medium.com/data-science-at-microsoft/how-to-access-an-api-for-first-time-api-users-879002f5f58d?source=friends_link&sk=c2763957800727392111bfe47da08fb3) that gives a handy overview of APIs and a step-by-step guide on how to use APIs in Python for first-time API users. To keep an eye out for upcoming articles in this series, follow [Deepsha](https://medium.com/@menghani.deepsha), [Riesling](https://medium.com/@rieslingfyi), or [Data Science \@ Microsoft](https://medium.com/data-science-at-microsoft) (all on Medium.com).
+
+## 
+Why collaborate between R and Python
+
+Both R and Python are powerful data science languages and can be used to accomplish end-to-end analytics projects. Although there is a lot of overlap in capabilities between the languages, each language has its strength. For example, you may use R for its powerful data visualization libraries and use Python for its ML libraries. So, there may be some things you would want to do in Python and some things in R within a single project. Additionally, each person has their own preference, so there might also be a scenario where you might want to use R and collaborate with another teammate on a project where they may prefer Python. Reticulate makes it easy to collaborate and talk between the two languages. I think of it as a translator on my fingertips.
 
 In this project we divided Python and R components in the following way:
 
--   Riesling used Python to write functions that use the Ravelry API to return a json object. She then converted it into a Python data frame to be returned by the function. You can find these functions in a file called ***"python_api_functions"***.
--   I then used R to source the python function file created by Riesling, called the python functions that then directly and very smartly returned an R data frame for further analysis in R.
+-   Riesling used Python to write functions that use the Ravelry API to return a JSON object. She then converted it into a Python data frame to be returned by the function. You can find these functions in a file called ***\"python_api_functions\"***.
 
-Let's get started on the details of how we accomplished this, the packages needed and the various function calls.
+-   I then used R to source the Python function file created by Riesling and called the Python functions using the Reticulate package, which automatically returned an R data frame for further analysis in R.
+
+Let\'s get started on the details of how we accomplished this, the packages needed, and the various function calls.
 
 # Important note as you navigate the article
 
 ### Switching between R and Python code
 
-I will be switching between Python and R code snippets. The python code is always from the python functions file and the R code snippets are from the R file being used to call the python functions. Each code snippet will have a handy comment right on top as a reminder of what language that snippet is from.   
+I will be switching between Python and R code snippets. The Python code is always from the Python functions file and the R code snippets are from the R file being used to call the Python functions. Each code snippet has a handy comment right on top as a reminder of what language that snippet is from.
 
 ### Where to find the code files
 
@@ -59,13 +62,15 @@ You can find the code to recreate everything in this article at this [github rep
 
 ### Accessing Ravelry data through API
 
-The code in this article accesses data through Ravelry API calls. For running the code you will need a pro Ravelry account (free to create), and then create an App as in the snapshot below. The *"Basic Auth: read only access"* should be sufficient for running most of the article code. However if you also want to access the "Favorites list" on Ravelry, you will need an App with *"Basic Auth: personal account access"*. Once you create the app, you will be provided username and password that allows access to the data using the API. This step is very quick! :) For this article I created a personal account access app so I could also analyze favorited patterns.
+The code in this article accesses data through Ravelry API calls. To run the code, you need a pro Ravelry account (free to create), and then you must create an App as in the snapshot below. The *\"Basic Auth: read only access\"* should be sufficient for running most of the article code. However, if you also want to access the \"Favorites list\" on Ravelry, you will need an App with *\"Basic Auth: personal account access\"*. After you create the app, you will be provided with a username and password that allow access to the data using the API. This step is very quick!
 
-![](images/paste-505C30DF.png)
+For this article I created a personal account access app so I could also analyze favorite patterns.
+
+![](images/rav_snapshot.png)
 
 # Loading the base libraries
 
-The Reticulate package allows working between Python and R seamlessly. If you do not have the below packages installed, you can use the command ***install.packages("package name")*** to install them.
+The Reticulate package allows working between Python and R seamlessly. If you do not have the below packages installed, you can use the command ***install.packages(\"package name\")*** to install them before calling the libraries.
 
 ```{r install packages, message=FALSE, warning=FALSE, include=TRUE, paged.print=FALSE, eval=TRUE, echo=TRUE}
 # R
@@ -84,7 +89,7 @@ library(dotenv)
 
 # Sourcing the python functions file from R
 
-You can run the below command in your R file to source the python file with all the functions. Then you will be able to call those python functions from R as if they were written in R. Isn't that neat!!!
+You can run the command below in your R file to source the Python file with all the functions. Then you will be able to call those Python functions from R as if they were written in R. Isn\'t that neat! In this case my Python file is in the same folder as the R file I am calling it from.
 
 ```{r source python functions file}
 # R
@@ -93,9 +98,9 @@ source_python("python_api_functions.py")
 
 ```
 
-Once you have installed and called the "reticulate" package, when trying to source the python functions file, you may be asked to install "miniconda". You can install it [here](https://docs.conda.io/en/latest/miniconda.html).
+Once you have installed and called the \"Reticulate\" package, when trying to source the Python functions file, you may be asked to install \"miniconda\". You can install it [here](https://docs.conda.io/en/latest/miniconda.html).
 
-If you get an error while sourcing the python file, that some python packages are missing, you can install them using the following command in python. It is a good idea to check if you have the python packages installed that are sourced in the functions file before sourcing it.
+While sourcing the Python file, if you get an error indicating that some Python packages are missing, you can install them using the following command in Python. It is a good idea to check whether you have the Python packages installed that are sourced in the functions file before sourcing them.
 
 ``` python
 # Python
@@ -105,7 +110,7 @@ If you get an error while sourcing the python file, that some python packages ar
 
 ### Let's test the sourced python file
 
-There is a greeting function in the python file that requires a simple string input. Let's call that function from the R file to make sure that the python file and its functions got sourced correctly.
+There is a greeting function in the Python file that requires a simple string input. Let\'s call that function from the R file to make sure that the Python file and its functions have been sourced correctly.
 
 ```{r test sourcing}
 # R
@@ -113,11 +118,11 @@ There is a greeting function in the python file that requires a simple string in
 greeting_fellow_humans("Optimus")
 ```
 
-Great, looks like we successfully sourced a python file from R and called a python function! Let's move on to other slightly more complex python function calls from R.
+Great, looks like we successfully sourced a Python file from R and called a Python function! Let\'s move on to other slightly more complex Python function calls from R.
 
 # Calling python function with username and password inputs
 
-Let's start with a simple python function that Riesling wrote to get yarn weights from the Ravelry API. Below is what the python function looks like.
+Let\'s start with a simple Python function that Riesling wrote to get yarn weights using the Ravelry API. Below is what the Python function declaration and return looks like. We do not need to understand how it executes in Python, but we do need to know what information to give it and the data type of what will be returned in order to implement it in our R code, so to reduce confusion, we will just include a placeholder for the actual code logic.
 
 ``` python
 # Python 
@@ -130,7 +135,7 @@ def get_yarnweights(authUsername:str, authPassword:str) -> pd.core.frame.DataFra
     return pd.DataFrame.from_records(json.loads(r1.text)['yarn_weights'])
 ```
 
-To call this function from my R file, I need to input a username and password for my Ravelry app while calling the function. I stored those in a **.env** file inside my home folder. I then used **dotenv** package to access my username and password. This enabled me to not have it visibly written in my R code.
+To call this function from my R file, I need to input a username and password for my Ravelry app while calling the function. I stored those in a **.env** file inside my home folder. I then used the **dotenv** package to access my username and password. This enabled me to not have it visibly written in my R code.
 
 ```{r getting env variables}
 # R
@@ -143,7 +148,7 @@ authUsername = Sys.getenv('authUsername')
 authPassword = Sys.getenv('authPassword')
 ```
 
-Now that I have my username and password stored secretly, I can call the python function from R using the environment variables as input into the Python function.
+Now that I have my username and password stored secretly, I can call the Python function from R using the environment variables as input into the Python function.
 
 ```{r calling basic function}
 # R 
@@ -158,13 +163,13 @@ yarnweights %>%
 
 <br>
 
-Awesome!! I ran a python function from my R file that required a user input, and I got the output. What is even more exciting is that Reticulate is smart enough to return an R dataframe when I call the function from R instead of a Python dataframe which the original python function returned! Now I can easily use GGPlot directly on this data frame to plot beautiful charts.
+Awesome! I ran a Python function from my R file that required user input, and I received the output. What is even more exciting is that Reticulate is smart enough to return an R dataframe when I call the function from R instead of the Python dataframe that the original Python function returned! Now I can easily use GGPlot directly on this data frame to plot beautiful charts.
 
-But before we do that, let's try to call a few other Python functions from R and may be also resolve some errors along the way.
+But before we do that, let\'s try to call a few other Python functions from R. And, I will also resolve some errors that we encounter along the way.
 
 # Calling python function with more inputs
 
-There is a Python function that Riesling wrote called ***"get_queue()"*** which takes an input of a ravelry username, and returns the projects in their queue.  Let's take a look at the python function skeleton, and then the R code of how to call it.
+There is a Python function that Riesling wrote called ***\"get_queue()\"*** that takes an input of a Ravelry username and returns the projects in that user\'s queue. Let\'s take a look at the Python function skeleton, and then the R code of how to call it.
 
 ``` python
 # Python 
@@ -175,11 +180,11 @@ def get_queue(authUsername:str, authPassword:str, rav_username = 'rieslingm', qu
     ...
     ...
     return pd.DataFrame.from_records(json.loads(r1.text)['queued_projects'])
-
 ```
+
 <br>
 
-My ravelry username is *'yarnsandcoffee'*, so let's look at my queue by calling this python function from R.
+My Ravelry username is *'yarnsandcoffee'*, so let's look at my queue by calling this python function from R.
 
 ```{r getting queue}
 # R
@@ -193,9 +198,7 @@ project_queue %>%
 
 ```
 
-Works like a charm, and I get an R dataframe to work with.
-
-Now I want to get further details of each of the above patterns in my queue. Let's try another python function call where I input a pattern id to get the details of the pattern in return, like the yardage of yarn required to make that pattern. Let's take a look at the python function skeleton.
+Works like a charm, and I get an R dataframe to work with. Now I want to get further details of each of the above patterns in my queue. Let\'s try another Python function call where I input a pattern_id to get the details of the pattern in return, like the yardage of yarn required to make that pattern. Let\'s take a look at the Python function skeleton.
 
 ``` python
 # Python 
@@ -208,7 +211,7 @@ def get_pattern_details(authUsername:str, authPassword:str, pattern_id:int) -> p
     return pd.json_normalize(json.loads(r1.text)['pattern'], max_level = 1)
 ```
 
-From the above function requirement, we see that it needs an integer input for 'pattern_id' to return the pattern details. Let's try that.
+From the above function requirement, we see that it needs an integer input for \'pattern_id\' to return the pattern details. Let\'s try that.
 
 ``` r
 # R
@@ -216,9 +219,9 @@ From the above function requirement, we see that it needs an integer input for '
 pattern_details <- get_pattern_details(authUsername, authPassword, pattern_id = 1168477)
 ```
 
-Running the above unfortunately threw an error for me that said *"Error in py_call_impl(callable, dots\$args, dots\$keywords) : json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)".*
+Running the above unfortunately threw an error for me that said *\"Error in py_call_impl(callable, dots\$args, dots\$keywords) : json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\".*
 
-Thankfully, a very simple edit to the function call fixed the error. Let's try giving the pattern_id within quotes instead of as an integer.
+Thankfully, a very simple edit to the function call fixed the error. Let\'s try providing the pattern_id within quotes instead of as an integer.
 
 ```{r getting pattern details}
 # R
@@ -237,11 +240,13 @@ Great, that worked with a simple fix.
 
 # Combine and iterate over api calls
 
-Now let's say I want to find out the yardage of yarn I will need for all the projects in my queue. For this I need to
+Now let\'s say I want to find out the yardage of yarn I will need for all the projects in my queue. For this I need to:
 
--   Get my queue with project_ids using the ***get_queue()*** function api call
--   Then, take the pattern_ids from the queue, en-quote them before passing into the ***get_pattern_details()*** function api call for the yardage information. For this I created a handy R function called ***get_pattern_details_from_pattern_id()*** as below
--   Pass a list of pattern_ids one item at a time into the function call using ***[purrr::map](https://purrr.tidyverse.org/reference/map.html)*** functionality
+1.  Get my queue with project_ids using the ***get_queue()*** function API call.
+
+2.  Take the pattern_ids from the queue and en-quote them before passing into the ***get_pattern_details()*** function API call for the yardage information. For this I created a handy R function called ***get_pattern_details_from_pattern_id()*** as below.
+
+3.  Pass a list of pattern_ids one item at a time into the function call using [***purrr::map***](https://purrr.tidyverse.org/reference/map.html)
 
 ```{r get queue yardage}
 
@@ -263,20 +268,20 @@ queue_yardage_df <- project_queue %>%
 yardage_needed <- queue_yardage_df %>% unnest(yardage) %>%  summarise(sum(yardage, na.rm=TRUE)) %>% pull()
 
 queue_yardage_df %>% 
-  arrange(desc(yardage)) %>% head() %>% datatable()
+  arrange(desc(yardage)) %>% head(4) %>% datatable()
 
 
 ```
 
 <br>
 
-Now I can sum up the yardage to find out whether I have enough yarn in my stash to finish all projects in my queue. I definitely do!!! Looks like I need `r yardage_needed` yards.
+Now I can sum up the yardage to find out whether I have enough yarn in my stash to finish all the projects in my queue. I definitely do!!! Looks like I need over 15,000 yards.
 
-Seems like I can make everything in my queue. But do I have enough yardage to make every pattern that I have Favorited ever? Let's find out.
+It seems that I can make everything in my queue. But do I have enough yardage to make every pattern that I have ever favorited? Let\'s find out.
 
 # Favorite patterns: Making an API call over multiple pages
 
-Another handy python function that Riesling wrote is called ***"get_favorites()"***. Similar to the previous get_queue function, it takes an input of a ravelry username, and returns the projects in their *Favorites* list. My ravelry username is *'yarnsandcoffee'*, so let's look at all the patterns I have favorited ever by calling this python function from R. Note that for this API call, you need a personal account access app username and password, which is what I am using for my analysis.
+Another handy Python function that Riesling wrote is called ***\"get_favorites()\"***. Similar to the previous get_queue function, it takes an input of a Ravelry username and returns the projects in their *Favorites* list. My Ravelry username is *\'yarnsandcoffee\'*, so let\'s look at all the patterns I have ever favorited by calling this Python function from R. Note that for this API call, you need a personal account access app username and password, which is what I am using for my analysis.
 
 Below is what the skeleton of the ***get_favorites()*** function looks like:
 
@@ -291,7 +296,7 @@ def get_favorites(authUsername, authPassword, rav_username, ..., page = 1, page_
     return pd.json_normalize(json.loads(r1.text)['favorites'], max_level = 1)
 ```
 
-The limitation of api calls is that it returns 1 page at a time and each page has limited number of entities. For instance, the above function will return the latest 100 patterns in my "Favorites" list. However I know I have a little over 1000 favorites. So let's iterate the "get_favorites()" function call over first 15 pages of 100 patterns each.
+A limitation of the API calls is that the information is returned one page at a time and each page has a limited number of entities. For instance, the above function will return the latest 100 patterns in my \"Favorites\" list. However, I know that I have over 1300 favorites. So let\'s iterate the \"get_favorites()\" function call over first 14 pages of 100 patterns each.
 
 ```{r getting favorites}
 
@@ -300,7 +305,7 @@ The limitation of api calls is that it returns 1 page at a time and each page ha
 pagelist <- 1:14
 
 project_favorite <- pagelist %>% 
-  map_dfr(~(get_favorites(authUsername, authPassword, rav_username = 'yarnsandcoffee', page = 14) %>% select(id, created_at, favorited.id, favorited.name))) %>% 
+  map_dfr(~(get_favorites(authUsername, authPassword, rav_username = 'yarnsandcoffee', page = .x) %>% select(id, created_at, favorited.id, favorited.name))) %>% 
   mutate(pattern_id = favorited.id)
 
 project_favorite %>% 
@@ -315,29 +320,26 @@ The above table shows that there are a total of `r nrow(project_favorite)` favor
 
 # Bypassing iteration errors by using "possibly()"
 
-Now that I have a list of my favorites I will repeat similar exercise I did above to get my queue yardage, but this time for my favorites list. Spoiler alert, while iterating the entire list of my favorited patterns through ***get_pattern_details_from_pattern_id()*** function using ***map*** I will get an error for a few pattern_id API function calls, but we will see how to easily bypass that error.
+Now that I have a list of my favorites, I will repeat a similar exercise to what I did above to get my queue yardage, but this time for my favorites list. Spoiler alert, while iterating the entire list of my favorited patterns through ***get_pattern_details_from_pattern_id()*** function using ***map*** I will get an error for a few pattern_id API function calls, but we will see how to easily bypass that error.
 
-
-```{.r}
+``` r
 # R
 
 # Split the favorites, and pass each pattern_id into the above function using map, then reduce the split dataset to a single dataframe
 favorite_yardage_df <- project_favorite %>%
   split(.$id) %>% # Split into data frame
   map(~get_pattern_details_from_pattern_id(select(.,pattern_id ) %>% pull()))  %>% # get pattern_id details
-
 ```
 
-When running the above code, map will run through some of the pattern ids correctly. In case there is an issue with the function call for any pattern_id , map() will stop iterating and may throw an error with the following message
+When running the code above, map will run through some of the pattern ids correctly. In case there is an issue with the function call for any pattern_id , map() will stop iterating and may throw an error with the following message:
 
 <br>
 
-![](images/paste-F223104D.png) 
-<br>
+![](images/paste-F223104D.png) <br>
 
-Let's instead create a "safe" function call using ___"possibly()"___ wrapper function that map can iterate through, but not necessarily stop running when an error is encountered for a single pattern_id. Instead, we want map to bypass that error, and continue with the next pattern_id in the list. 
+Let\'s instead create a \"safe\" function call using ***\"possibly()\"*** wrapper function that map can iterate through, but not necessarily stop running when an error is encountered for a single pattern_id. Instead, we want map to bypass that error, and continue with the next pattern_id in the list.
 
-While bypassing the error, ___possibly()___ also allows to input an alternate return value using the _"otherwise"_ parameter call. In this case I am going to ask possibly to return NULL if there is an error. Now when I use this function instead to iterate through my favorited pattern_ids, an error to the api call will not halt the iteration but continue with the next element in the list.  I can then also easily calculate the number of ids that gave me an error, or the specific ids that did so.
+While bypassing the error, ***possibly()*** also allows the input of an alternate return value using the *\"otherwise\"* parameter call. In this case I am going to ask possibly to return NULL if there is an error. Now when I use this function instead to iterate through my favorited pattern_ids, an error to the API call will not halt the iteration but instead will continue with the next element in the list. I can then also easily calculate the number of ids that gave me an error, or the specific IDs that did so.
 
 ```{r creating safe function}
 
@@ -366,7 +368,7 @@ ids_with_errors <- project_favorite_details %>%
 ids_with_errors
 ```
 
-Looks like there were only `r number_of_errors` ids that had an error during the function call and returned NULL instead. Relative to `r nrow(project_favorite)` number of patterns in my entire list of favorites, this is not too many errors. Hence, I will skip these ids and go ahead with calculating the yardage of yarn I need to make everything else in my favorites list. I can use the ___purrr::compact()___ function call to only gather the non-NULL outputs and continue with the rest of yardage calculation similar to what I did with my project queue.     
+Looks like there were a few IDs that had an error during the function call and returned NULL instead. Relative to the over 1000 patterns in my entire list of favorites, this is not too many errors. Hence, I will skip these IDs and go ahead with calculating the yardage of yarn I need to make everything else in my favorites list. I can use the ***purrr::compact()*** function call to gather only the non-NULL outputs and continue with the rest of yardage calculation similar to what I did with my project queue.
 
 ```{r calculating yardages for favorite}
 
@@ -387,38 +389,52 @@ favorites_yardage_df %>%
 
 ```
 
-
-So, it seems like I need `r favorites_yardage_needed` yardage of yarn to make every project in my favorites list. Ummmm.... THAT's A LOT!!! Although I would not be surprised if I already have so much yarn in my yarn stash. 
+So, it seems like I need `r favorites_yardage_needed` yardage of yarn to make every project in my favorites list. Ummmm.... THAT's A LOT!!! Although I would not be surprised if I already have so much yarn in my yarn stash.
 
 # What we covered in this article
 
-There was a lot covered in this article, but below highlights can help you section what you took from it, which is how to: 
+There was a lot we covered in this article, but the highlights below can help you summarize what we described, which is how to:
 
- - Easily work with Python and R together and use the best of both worlds with ___Reticulate___ over multiple function calls
- - Use ___Dotenv___ to store and access secret keys from .env files
- - Iterate through API function calls using ___Purrr___
- - Handle errors while accessing API calls by changing input methods or calling functions safely with ___Possibly wrappers___ 
+-   Easily work with Python and R together and use the best of both worlds with ***Reticulate*** over multiple function calls.
+
+-   Use ***Dotenv*** to store and access secret keys from .env files.
+
+-   Iterate through API function calls using ***Purrr***
+
+-   Handle errors while accessing API calls by changing input methods or calling functions safely with ***Possibly wrappers***
 
 # What we learned about integrating Python and R
 
- - It is very easy to have a team of people working with whatever language they are comfortable with while still collaborate with each other    
- - In this scenario, Riesling wrote the API call functions in Python and I pulled those outputs by calling the functions from within R    
- - Riesling and I continued coding in two different files. I did not need to know the contents of the Python file or its functions to be able to call them from R, all I needed to know was the inputs and outputs of those function calls    
- - If Riesling made any edits to the internal mechanism of the Python functions, I would not get impacted. My R code to call those functions would not fail unless there are any major schema changes that are good to communicate
- - Even if a single person wants to do some of their coding in Python and some in R, it is very easy to pass variables from one to the other within the same file or across separate files
- 
-The biggest learning is that having multi-language talent across the team is a strength that ___Reticulate___ has unleashed and made it very easy to integrate into end to end projects. There is so much more that this package can do that we have not covered.     
+-   It is very easy to have a team of people working with whatever language they are comfortable with while still collaborating with each other.
+-   In this scenario, Riesling wrote the API call functions in Python and I pulled those outputs by calling the functions from within R.
+-   Riesling and I continued coding in two different files. I did not need to know the contents of the Python file or its functions to be able to call them from R; all I needed to know were the inputs and outputs of those function calls.
+-   If Riesling made any edits to the internal mechanism of the Python functions, I would not see an impact. My R code to call those functions would not fail unless there were any major schema changes (which are good to communicate).
+-   Even if a single person wants to do some of their coding in Python and some in R, it is very easy to pass variables from one to the other within the same file or across separate files.
+
+A challenge we faced:
+
+-   If you remember from our previous article, [How to access an API for first-time API users](https://medium.com/data-science-at-microsoft/how-to-access-an-api-for-first-time-api-users-879002f5f58d?source=friends_link&sk=c2763957800727392111bfe47da08fb3), Riesling put all of the Ravelry functions within a class with the API key as characteristics of the class. This way, the API key does not need to be an input parameter for each function. We tried to implement this into our R code using Reticulate, but got an error. 
+
+-   As we mentioned earlier, Reticulate dynamically changed the output of our functions from a Python dataframe to an R dataframe. Because we defined a new class called \'raveleryutils\' in Python, there was no R equivalent, so Reticulate did not know what to convert this object into.
+
+-   There might be a way to leverage Reticulate to use classes **define** in Python within the R environment, but for the sake of time, we simply removed the need for the \'raveleryutils\' class in our code.
+
+Our biggest learning is that having multi-language talent across the team is a strength that ***Reticulate*** has unleashed and made it very easy to integrate into end-to-end projects. There is so much more that this package can do that we have not covered in this article --- or really even learned for ourselves, like how to define and use classes across languages!
 
 # What is next
 
-Now that we have learned how to call Ravelry API in Python, use R to call the Python API function calls, we will move to the data analysis stage. In the next article of this series, we will dive into analyzing Ravelry queues and favorites using GGPlot to answer some very interesting questions like:
+Now that we have learned how to call the Ravelry API in Python and use R to call the Python API function calls, we will move to the data analysis stage. In the next article of this series, we will dive into analyzing Ravelry queues and favorites using GGPlot to answer some very interesting questions like:
 
- - What year did Riesling and I started adding projects to our Ravelry queues and what has the yearly trend been since. Hint: Surprisingly, it was a very similar yearly trend   
- - What days of week are Riesling and I most active on adding projects in our Ravelry    
- - What type of projects do Riesling and I gravitate towards, and has it changed over the years
- - Who are our favorite pattern designers
- - And my favorite question - What yarn weight type should I gift Riesling for the holiday season (Any quesses?)
+-   What year did Riesling and I start adding projects to our Ravelry queues and what has the yearly trend been since. Hint: Surprisingly, it was a very similar yearly trend.
 
-Follow [Riesling](https://medium.com/@rieslingfyi), [Deepsha](https://medium.com/@menghani.deepsha) or [Data Science \@ Microsoft](https://medium.com/data-science-at-microsoft) (all on medium) to see the previous article in this series and stay tuned for the next one.
+-   What days of the week are Riesling and I most active on adding projects in our Ravelry.
 
+-   What type of projects do Riesling and I gravitate toward, and has it changed over the years.
 
+-   Who are our favorite pattern designers.
+
+-   And my favorite question: What yarn weight type should I give Riesling for the holiday season. (Any guesses?)
+
+Follow [Deepsha](https://medium.com/@menghani.deepsha), [Riesling](https://medium.com/@rieslingfyi), or [Data Science \@ Microsoft](https://medium.com/data-science-at-microsoft) (all on Medium.com) to see the previous article in this series and stay tuned for the next one.
+
+\
