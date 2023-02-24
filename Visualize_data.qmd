@@ -44,6 +44,7 @@ library(reticulate)
 # For storing any secret keys required by API calls
 library(dotenv)
 
+# Functions to get data ready for plots
 source("./data_cleaning_functions.R")
 ```
 
